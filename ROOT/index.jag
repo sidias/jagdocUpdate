@@ -1,0 +1,19 @@
+<%
+var indexer, fileList, getFileList;
+
+getFileList = require("/modules/fileOperation.js");
+fileList = getFileList.read();
+
+
+//indexer = require('/modules/search.js');
+//indexer.index();
+
+
+var caramel;
+	caramel = require('caramel');
+	caramel.render({
+		'title': {text :'Jaggery'},
+		'body' : {},
+		'nav'  : {currentPage:'home'}
+	});
+%>
