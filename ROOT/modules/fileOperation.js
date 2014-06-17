@@ -1,9 +1,10 @@
-var dirApi, dirExamples, dirProperties, apiContent,
+var dirApi, dirExamples, dirProperties, dirHbs, hbsFileSet, apiContent,
     exampleContent, propertiesContent, subPropertiesContent;
 
 dirApi = "/config/apis";
 dirExamples = "/config/examples";
 dirProperties = "/config/properties";
+dirHbs = "/themes/ROOT/partials/";
 
 apiContent = {};
 exampleContent = {};
@@ -11,24 +12,53 @@ propertiesContent = {};
 subPropertiesContent = {};
 
 var pages = [{
-    page : "About",
+    page : "about.hbs",
     url : "/about.jag"
 }, {
-    page : "Quickstart",
-    url : "/quickstart.jag"
-}, {
-    page : "Documentation",
+    page : "documentation.hbs",
     url : "/documentation.jag"
 }, {
-    page : "Tools",
+    page : "quickstart.hbs",
+    url : "/quickstart.jag"
+}, {
+    page : "tools.hbs",
     url : "/tools.jag"
 }, {
-    page : "Samples",
+    page : "samples.hbs",
     url : "/samples.jag"
 }, {
-    page : "Try it!",
+    page : "tryit.hbs",
     url : "/tryit.jag"
 }];
+
+
+var fullContents = {};
+
+function readHbs () {
+    var file, hbsFile, hbsContent, fileName, fn;
+
+    hbsFileSet = [];
+
+    for(var i = 0; i < pages.length; i++) {
+        //hbsFileSet.push(hbsFile);
+        hbsFile = {};
+        fileName = (dirHbs + (pages[i]).page);
+        fn = ((pages[i]).page).split(".");
+
+        file = new File(fileName);
+        file.open("r");
+        hbsContent = file.readAll();
+        file.close();
+
+        hbsFile.key = fn[0];
+        hbsFile.content = hbsContent;
+        hbsFile.url = pages[i].url;
+
+        hbsFileSet[i] = hbsFile;
+    }
+    return hbsFileSet;
+}
+
 var log = new Log();
 function readExamples () {
     var file, fileName;
@@ -106,9 +136,11 @@ function hasOwnProperty (obj, prop) {
     return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-var fullContents = {};
+(function fullContent() {
+    readExamples();
+    readProperties();
+    readApis();
 
-function fullContent() {
     var subContent;
     var apiKeys = Object.keys(apiContent);
 
@@ -137,20 +169,32 @@ function fullContent() {
         }
         return true;
     });
+})();
+
+function pageSet() {
+    var page, pageSet = [];
+
+    for(var key in fullContents) {
+        page = {};
+        page.key = key;
+        page.content = fullContents[key];
+        page.url = "/documentation.jag?api="+key;
+
+        pageSet.push(page);
+    }
+
+    var hbsPageSets = readHbs();
+    pageSet = pageSet.concat(hbsPageSets);
+
+    var log = new Log();
+    for(var k = 0; k<(pageSet.length)-3; k++){
+    log.info(pageSet[k].key+"----------------");
+    log.info(pageSet[k].content+"**************");
+    }
+
+    return pageSet;
 }
 
-
 var read = function () {
-    readExamples();
-    readProperties();
-    readApis();
-
-    fullContent();
-
-    var k = Object.keys(fullContents);
-    var log = new Log();
-    log.info("((((((((((((((((((((((((((((((("+ k.length);
-    log.info("&&&&&&&&&&&&");
-    log.info(fullContents["file"]);
-
+    return pageSet();
 }

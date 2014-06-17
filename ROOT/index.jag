@@ -1,12 +1,31 @@
 <%
-var indexer, fileList, getFileList;
+var indexer, filesContent, getFileList, indexed, indexedValue,
+        dataStore, resource, resExists, prop;
 
-getFileList = require("/modules/fileOperation.js");
-fileList = getFileList.read();
+indexed = false;
+var log = new Log();
 
+dataStore = new MetadataStore("admin", "admin");        //some wrong in here.
+resource = dataStore.newResource();
 
-//indexer = require('/modules/search.js');
-//indexer.index();
+resExists = dataStore.resourceExists("rootinfo.xml");
+
+if (resExists) {
+    indexed = (dataStore.get("rootinfo.xml")).getProperty("indexed");
+}
+
+if (!indexed) {
+    getFileList = require("/modules/fileOperation.js");
+    filesContent = getFileList.read();
+
+    indexer = require('/modules/search.js');
+    indexedValue = indexer.index(filesContent);
+}
+
+if (indexedValue == 0) {
+    resource.addProperty("indexed", "true");
+    dataStore.put("rootinfo.xml", resource);
+}
 
 
 var caramel;
