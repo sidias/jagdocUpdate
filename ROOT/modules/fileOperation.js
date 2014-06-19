@@ -71,7 +71,7 @@ function readExamples () {
             file = listFiles[i];
             file.open("r");
             fileName = (file.getName()).split(".");
-            exampleContent[fileName[0]] = file.readAll(); //check object assignment is right
+            exampleContent[fileName[0]] = file.readAll();
             file.close();
         }
     }
@@ -150,12 +150,12 @@ function hasOwnProperty (obj, prop) {
         fullContents[value] = apiContent[value];
 
         if(hasOwnProperty(exampleContent, value)) {
-            fullContents[value] = fullContents[value].concat("*******").
+            fullContents[value] = fullContents[value].concat(" ").
                 concat(exampleContent[value]);
         }
 
         if(hasOwnProperty(propertiesContent, value)) {
-            fullContents[value] = fullContents[value].concat("*******").
+            fullContents[value] = fullContents[value].concat(" ").
                 concat(propertiesContent[value]);
         }
 
@@ -163,7 +163,7 @@ function hasOwnProperty (obj, prop) {
             subContent = subPropertiesContent[value];
 
             for (var key in subContent) {
-                fullContents[value] = fullContents[value].concat("********").
+                fullContents[value] = fullContents[value].concat(" ").
                     concat(subContent[key]);
             }
         }
@@ -185,12 +185,6 @@ function pageSet() {
 
     var hbsPageSets = readHbs();
     pageSet = pageSet.concat(hbsPageSets);
-
-    var log = new Log();
-    for(var k = 0; k<(pageSet.length)-3; k++){
-    log.info(pageSet[k].key+"----------------");
-    log.info(pageSet[k].content+"**************");
-    }
 
     return pageSet;
 }

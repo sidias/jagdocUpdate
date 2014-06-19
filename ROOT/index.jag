@@ -7,6 +7,7 @@ var log = new Log();
 
 dataStore = new MetadataStore("admin", "admin");        //some wrong in here.
 resource = dataStore.newResource();
+dataStore.remove("rootinfo.xml");
 
 resExists = dataStore.resourceExists("rootinfo.xml");
 
@@ -26,7 +27,6 @@ if (indexedValue == 0) {
     resource.addProperty("indexed", "true");
     dataStore.put("rootinfo.xml", resource);
 }
-
 
 var caramel;
 	caramel = require('caramel');

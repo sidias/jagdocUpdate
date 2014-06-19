@@ -31,7 +31,9 @@ var result = function (searchParameter) {
      addFacetField("category").
      addFacetField("inStock");
      QueryResponse rsp = server.query(solrQuery);*/
-    var res = [];
+    var res = [],
+        tmpUrl,
+        hasquery;
 
     var response = solr.query(query);
     var results = response.getResults();
@@ -40,8 +42,18 @@ var result = function (searchParameter) {
     for (var i = 0; i < results.size(); ++i) {
         var obj = {};
         obj.key = results.get(i).getFieldValue("id");
-        obj.url = results.get(i).getFieldValue("manu");
+        //obj.url = results.get(i).getFieldValue("manu");
 
+        tmpUrl = String(results.get(i).getFieldValue("manu"));
+        hasquery = tmpUrl.indexOf('?');
+
+        if (hasquery == -1) {
+            tmpUrl = tmpUrl.concat("?keyword=" + searchParameter);
+        } else {
+            tmpUrl = tmpUrl.concat("&keyword=" + searchParameter);
+        }
+
+        obj.url = tmpUrl;
         res[i] = obj;
     }
     return res;
