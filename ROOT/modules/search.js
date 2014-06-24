@@ -1,6 +1,5 @@
 importClass(Packages.org.apache.solr.client.solrj.SolrQuery);
 importClass(Packages.org.apache.solr.client.solrj.SolrServerException);
-importClass(Packages.org.apache.solr.client.solrj.impl.CommonsHttpSolrServer);
 importClass(Packages.org.apache.solr.client.solrj.response.QueryResponse);
 importClass(Packages.org.apache.solr.common.SolrDocumentList);
 importClass(Packages.org.apache.solr.common.SolrInputDocument);
@@ -8,13 +7,13 @@ importClass(Packages.org.apache.solr.common.SolrInputDocument);
 var IOException = java.io.IOException;
 var ArrayList   = java.util.ArrayList;
 var Collection  = java.util.Collection;
+var files       = java.io.File;
 
-var url = "http://localhost:8983/solr"; //need to change this when we put into server
-var server ;
+var log = new Log();
 
 var result = function (searchParameter) {
 
-    var solr = new CommonsHttpSolrServer(url);
+    var solr = server
 
     var query = new SolrQuery();
     query.setQuery(String(searchParameter));
@@ -37,14 +36,15 @@ var result = function (searchParameter) {
 
     var response = solr.query(query);
     var results = response.getResults();
-    var log = new Log();
 
     for (var i = 0; i < results.size(); ++i) {
         var obj = {};
         obj.key = results.get(i).getFieldValue("id");
-        //obj.url = results.get(i).getFieldValue("manu");
 
-        tmpUrl = String(results.get(i).getFieldValue("manu"));
+        tmpUrl = String(results.get(i).getFieldValue("sku"));
+        log.info("**************************************************");
+        log.info(tmpUrl);
+
         hasquery = tmpUrl.indexOf('?');
 
         if (hasquery == -1) {
@@ -54,21 +54,20 @@ var result = function (searchParameter) {
         }
 
         obj.url = tmpUrl;
+        obj.overview = String(results.get(i).getFieldValue("description"));
+
         res[i] = obj;
     }
     return res;
 }
-
 
 var index = function (contentSet) {
     var csLength = contentSet.length;
     var docs = new ArrayList();
     var content, doc;
 
-    server = new CommonsHttpSolrServer(url);
-
-    server.setMaxRetries(1);
-    server.setConnectionTimeout(5000);
+    //server.setMaxRetries(1);
+    //server.setConnectionTimeout(5000);
 
     for(var k = 0; k < csLength; k++) {
         content = contentSet[k];
@@ -76,14 +75,13 @@ var index = function (contentSet) {
         doc = new SolrInputDocument();
         doc.addField( "id", content.key);
         doc.addField( "name", content.content);
-        doc.addField( "manu", content.url);
+        doc.addField( "sku", content.url);
+        doc.addField("description", content.overview);
 
         docs.add(doc);
     }
 
     server.add(docs);
-    var state = server.commit();
-    return (state.getStatus());
-
+    server.commit();
 }
 

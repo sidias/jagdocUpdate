@@ -1,9 +1,10 @@
 <%
 var caramel, searchResult, solrSearch, searchTerm;
+
 var log = new Log();
 solrSearch = require('/modules/search.js');
 
-searchTerm = request.getParameter('search');
+searchTerm = String(request.getParameter('search'));
 
 if (searchTerm) {
     searchResult = solrSearch.result(searchTerm);
@@ -17,7 +18,8 @@ caramel = require('caramel');
 caramel.render({
     'title': {text :'search'},
     'body' : {
-        searchResults : searchResult
+        searchResults : searchResult,
+        searchTerm : searchTerm
     },
     'nav'  : {currentPage:''}
 });
